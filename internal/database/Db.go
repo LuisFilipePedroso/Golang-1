@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	. "api/internal/models"
+	. "api/api/models"
 
 	"github.com/google/uuid"
 )
