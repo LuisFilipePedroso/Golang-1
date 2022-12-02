@@ -5,15 +5,17 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-
-	. "api/api/models"
-
-	"github.com/google/uuid"
 )
 
 var FILENAME = "db.json"
 
-func Get(table string) []Todo {
+type DB[T any] struct{}
+
+func NewDB[T any](db T) *DB[T] {
+	return &DB[T]{}
+}
+
+func (d *DB[T]) Get(table string) []T {
 	data, err := os.Open(FILENAME)
 
 	if err != nil {
@@ -28,23 +30,19 @@ func Get(table string) []Todo {
 		panic("Error on read table")
 	}
 
-	result := map[string][]Todo{}
+	result := map[string][]T{}
 
 	json.Unmarshal([]byte(jsonData), &result)
 
 	return result[table]
 }
 
-func Record(table string, todo *Todo) {
-	db := Get(table)
+func (d *DB[T]) Record(table string, payload *T) {
+	db := d.Get(table)
 
-	id := uuid.New()
+	appendedData := append(db, *payload)
 
-	todo.ID = id.String()
-
-	appendedData := append(db, *todo)
-
-	result := map[string][]Todo{
+	result := map[string][]T{
 		table: appendedData,
 	}
 
